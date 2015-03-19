@@ -1,0 +1,8 @@
+## Title: Save Skill Builds
+## APIVersion: 100010
+## SavedVariables: SSBMem
+
+SSB.lua
+SSB.xml
+Dictionnary.lua
+Bindings.xml

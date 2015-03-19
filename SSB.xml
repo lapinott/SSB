@@ -1,0 +1,9 @@
+<GuiXml>
+	<Controls>
+		<TopLevelControl>
+			<OnUpdate>
+				SSB.DoNothing()
+			</OnUpdate>
+		</TopLevelControl>
+	</Controls>
+</GuiXml>

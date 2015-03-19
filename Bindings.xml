@@ -1,0 +1,160 @@
+<Bindings>
+	<Layer name="SI_KEYBINDINGS_CATEGORY_GENERAL">
+		<Category name="SSB Quickload">
+			<Action name="SSB_LOAD_BUILD_1">
+				<Down>SSB.LoadBuild_HK("1")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_2">
+				<Down>SSB.LoadBuild_HK("2")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_3">
+				<Down>SSB.LoadBuild_HK("3")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_4">
+				<Down>SSB.LoadBuild_HK("4")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_5">
+				<Down>SSB.LoadBuild_HK("5")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_6">
+				<Down>SSB.LoadBuild_HK("6")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_7">
+				<Down>SSB.LoadBuild_HK("7")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_8">
+				<Down>SSB.LoadBuild_HK("8")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_9">
+				<Down>SSB.LoadBuild_HK("9")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_10">
+				<Down>SSB.LoadBuild_HK("10")</Down>
+			</Action>
+			
+			<Action name="SSB_LOAD_BUILD_11">
+				<Down>SSB.LoadBuild_HK("11")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_12">
+				<Down>SSB.LoadBuild_HK("12")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_13">
+				<Down>SSB.LoadBuild_HK("13")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_14">
+				<Down>SSB.LoadBuild_HK("14")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_15">
+				<Down>SSB.LoadBuild_HK("15")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_16">
+				<Down>SSB.LoadBuild_HK("16")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_17">
+				<Down>SSB.LoadBuild_HK("17")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_18">
+				<Down>SSB.LoadBuild_HK("18")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_19">
+				<Down>SSB.LoadBuild_HK("19")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_20">
+				<Down>SSB.LoadBuild_HK("20")</Down>
+			</Action>
+			
+			<Action name="SSB_LOAD_BUILD_21">
+				<Down>SSB.LoadBuild_HK("21")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_22">
+				<Down>SSB.LoadBuild_HK("22")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_23">
+				<Down>SSB.LoadBuild_HK("23")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_24">
+				<Down>SSB.LoadBuild_HK("24")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_25">
+				<Down>SSB.LoadBuild_HK("25")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_26">
+				<Down>SSB.LoadBuild_HK("26")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_27">
+				<Down>SSB.LoadBuild_HK("27")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_28">
+				<Down>SSB.LoadBuild_HK("28")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_29">
+				<Down>SSB.LoadBuild_HK("29")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_30">
+				<Down>SSB.LoadBuild_HK("30")</Down>
+			</Action>
+			
+			<Action name="SSB_LOAD_BUILD_31">
+				<Down>SSB.LoadBuild_HK("31")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_32">
+				<Down>SSB.LoadBuild_HK("32")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_33">
+				<Down>SSB.LoadBuild_HK("33")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_34">
+				<Down>SSB.LoadBuild_HK("34")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_35">
+				<Down>SSB.LoadBuild_HK("35")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_36">
+				<Down>SSB.LoadBuild_HK("36")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_37">
+				<Down>SSB.LoadBuild_HK("37")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_38">
+				<Down>SSB.LoadBuild_HK("38")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_39">
+				<Down>SSB.LoadBuild_HK("39")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_40">
+				<Down>SSB.LoadBuild_HK("40")</Down>
+			</Action>
+			
+			<Action name="SSB_LOAD_BUILD_41">
+				<Down>SSB.LoadBuild_HK("41")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_42">
+				<Down>SSB.LoadBuild_HK("42")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_43">
+				<Down>SSB.LoadBuild_HK("43")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_44">
+				<Down>SSB.LoadBuild_HK("44")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_45">
+				<Down>SSB.LoadBuild_HK("45")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_46">
+				<Down>SSB.LoadBuild_HK("46")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_47">
+				<Down>SSB.LoadBuild_HK("47")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_48">
+				<Down>SSB.LoadBuild_HK("48")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_49">
+				<Down>SSB.LoadBuild_HK("49")</Down>
+			</Action>
+			<Action name="SSB_LOAD_BUILD_50">
+				<Down>SSB.LoadBuild_HK("50")</Down>
+			</Action>
+		</Category>
+	</Layer>
+</Bindings>
