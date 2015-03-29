@@ -19,7 +19,7 @@ SSB.User.SavedBuildCount = 0
 SSB.name = "SSB"
 SSB.niceName = " » "
 SSB.command = "/ssb"
-SSB.version = 1.20
+SSB.version = 1.6
 SSB.varVersion = 1
 SSB.maxKeybinds = 50
 SSB.barOne = "barOne"
@@ -41,6 +41,7 @@ SSB.loadBuildId = nil
 SSB.silentLoad = false
 SSB.inCombat = false
 SSB.textNil = "nil"
+SSB.swapEventCount = 0
 
 -- Skill types
 SSB.skillTypes = {}
@@ -92,6 +93,10 @@ function SSB.DoNothing() return nil end
 
 -- Weapons swapped event
 function SSB.WeaponSwap (event, activeWeaponPair, locked)
+
+	-- 1.6 hack -> 3 weapon swap events fired per weapon swap......
+	SSB.swapEventCount = (SSB.swapEventCount + 1) % 3;
+	if SSB.swapEventCount > 0 then return nil end
 	
 	-- Save active skillbar
 	SSB.currentActiveSkillBar = activeWeaponPair;
@@ -100,6 +105,8 @@ function SSB.WeaponSwap (event, activeWeaponPair, locked)
 	-- Update pending
 	if SSB.saveActionBarSwapPending then SSB.SaveBuild (nil) end
 	if SSB.loadActionBarSwapPending then SSB.LoadBuild (SSB.loadActionBarSwapPendingBuildId) end
+	
+	--d(activeWeaponPair)
 	
 	return nil
 end
@@ -418,26 +425,14 @@ end
 function SSB.ListBindings ()
 	
 	-- Get all bindings
-	local bindOne = SSB.User.Bindings["1"];
-	local bindTwo = SSB.User.Bindings["2"];
-	local bindThree = SSB.User.Bindings["3"];
-	local bindFour = SSB.User.Bindings["4"];
-	local bindFive = SSB.User.Bindings["5"];
+	local count = 0;
+	for bindingKey, bindingId in pairs(SSB.User.Bindings) do
+		d(SSB.niceName .. "Keybind ID #" .. bindingKey .. " bound to " .. SSB.User.Builds[bindingId].friendlyName);
+		count = count + 1
+	end
 	
-	-- Get friendly names
-	local friendlyBindOne, friendlyBindTwo, friendlyBindThree, friendlyBindFour, friendlyBindFive;
-	if bindOne ~= nil then friendlyBindOne = SSB.User.Builds[bindOne]["friendlyName"] else friendlyBindOne = "Not bound." end
-	if bindTwo ~= nil then friendlyBindTwo = SSB.User.Builds[bindTwo]["friendlyName"] else friendlyBindTwo = "Not bound." end
-	if bindThree ~= nil then friendlyBindThree = SSB.User.Builds[bindThree]["friendlyName"] else friendlyBindThree = "Not bound." end
-	if bindFour ~= nil then friendlyBindFour = SSB.User.Builds[bindFour]["friendlyName"] else friendlyBindFour = "Not bound." end
-	if bindFive ~= nil then friendlyBindFive = SSB.User.Builds[bindFive]["friendlyName"] else friendlyBindFive = "Not bound." end
-	
-	-- Output
-	d(SSB.niceName .. "Keybind #1 : " .. friendlyBindOne);
-	d(SSB.niceName .. "Keybind #2 : " .. friendlyBindTwo);
-	d(SSB.niceName .. "Keybind #3 : " .. friendlyBindThree);
-	d(SSB.niceName .. "Keybind #4 : " .. friendlyBindFour);
-	d(SSB.niceName .. "Keybind #5 : " .. friendlyBindFive);
+	-- Exit
+	if count == 0 then d('You don\'t have any bindings yet.') end
 	
 	return nil
 end
@@ -498,8 +493,8 @@ end
 function SSB.AddKeyBinds (n)
 	
 	-- Exit if max keybinds reached
-	if SSB.User.Options.availableKeyBinds == SSB.maxKeybinds then
-		d('You can\'t have more than ' .. SSB.maxKeybinds .. '.');
+	if SSB.User.Options.availableKeyBinds + n > SSB.maxKeybinds then
+		d('You can\'t have more than ' .. SSB.maxKeybinds .. ' keybinds.');
 		return false;
 	end
 	
@@ -512,7 +507,7 @@ function SSB.AddKeyBinds (n)
 	SSB.User.Options.availableKeyBinds = SSB.User.Options.availableKeyBinds + n
 	
 	-- Notify
-	d('You now have ' .. SSB.User.Options.availableKeyBinds .. ' available keybinds.')
+	d('You now have ' .. SSB.User.Options.availableKeyBinds .. ' available keybinds. Please type /reloadui')
 	
 	return nil
 end
@@ -602,8 +597,8 @@ function SSB.SlashCommands(text)
 	if trigger == 'b' or trigger == 'bind' then
 		if command[2] == nil then
 			d(SSB.niceName .. "Please provide the #id of the binding you wish to bind !");
-		elseif command[2] ~= "1" and command[2] ~= "2" and command[2] ~= "3" and command[2] ~= "4" and command[2] ~= "5" then
-			d(SSB.niceName .. "Your available bindings are either '1', '2', '3', '4' or '5' !")
+		elseif tostring(tonumber(command[2])) ~= command[2] or tostring(tonumber(command[2])) == command[2] and tonumber(command[2]) > SSB.User.Options.availableKeyBinds then
+			d(SSB.niceName .. "This keybind is not available !")
 		elseif command[3] == nil then
 			d(SSB.niceName .. "Please specify the name or ID of the build you wish to bind to binding #" .. command[2] .. " !");
 		else SSB.Bind (command[2], command[3]) end

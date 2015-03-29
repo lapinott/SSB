@@ -1,5 +1,7 @@
 ## Title: Save Skill Builds
-## APIVersion: 100010
+## Author: Edda
+## Version: 1.6
+## APIVersion: 100011
 ## SavedVariables: SSBMem
 
 SSB.lua
