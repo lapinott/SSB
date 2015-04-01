@@ -185,10 +185,10 @@ function SSB.SaveBuild (buildName)
 					-- Check
 					if (texture == slotTexture or texture == SSB.Textures[slotTexture] or name == slotName or name == SSB.Dictionnary[slotName]) and name ~= "" then
 					
-					-- check
-					d(GetSkillAbilityId(skillType, skillIndex, abilityIndex))
-					d('.. texture = ' .. texture)
-					d('.. slotTexture = ' .. slotTexture)
+						-- check
+						d(GetSkillAbilityId(skillType, skillIndex, abilityIndex))
+						d('.. texture = ' .. texture)
+						d('.. slotTexture = ' .. slotTexture)
 					
 						-- Save build item
 						skills[slotIndex - 2] = {slotName, slotTexture, abilityIndex, skillIndex, skillType, slotIndex}
@@ -235,8 +235,8 @@ function SSB.SaveBuild (buildName)
 	local savedOrOverwritten;
 	if overWrite then savedOrOverwritten = "overwritten";
 	else savedOrOverwritten = "saved" end
-	if SSB.saveActionBarSwapPending then d(SSB.niceName .. "Build for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " " .. savedOrOverwritten .. " with id #" .. tostring(SSB.User.SavedBuildCount) .. " ! Please swap your weapons.") end
-	if not SSB.saveActionBarSwapPending then d(SSB.niceName .. "Build for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " " .. savedOrOverwritten .. " with id #" .. tostring(SSB.User.SavedBuildCount) .. " !") end
+	if SSB.saveActionBarSwapPending then d(SSB.niceName .. "Build '" .. buildName .. "' for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " " .. savedOrOverwritten .. " with id #" .. tostring(SSB.User.SavedBuildCount) .. " ! Please swap your weapons.") end
+	if not SSB.saveActionBarSwapPending then d(SSB.niceName .. "Build '" .. buildName .. "' for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " " .. savedOrOverwritten .. " with id #" .. tostring(SSB.User.SavedBuildCount) .. " !") end
 	
 	return nil
 end
