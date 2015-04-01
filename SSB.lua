@@ -95,8 +95,9 @@ function SSB.DoNothing() return nil end
 function SSB.WeaponSwap (event, activeWeaponPair, locked)
 
 	-- 1.6 hack -> 3 weapon swap events fired per weapon swap......
-	SSB.swapEventCount = (SSB.swapEventCount + 1) % 3;
-	if SSB.swapEventCount > 0 then return nil end
+	if activeWeaponPair == SSB.currentActiveSkillBar then return nil end
+	--SSB.swapEventCount = (SSB.swapEventCount + 1) % 3;
+	--if SSB.swapEventCount > 0 then return nil end
 	
 	-- Save active skillbar
 	SSB.currentActiveSkillBar = activeWeaponPair;
@@ -183,6 +184,11 @@ function SSB.SaveBuild (buildName)
 					
 					-- Check
 					if (texture == slotTexture or texture == SSB.Textures[slotTexture] or name == slotName or name == SSB.Dictionnary[slotName]) and name ~= "" then
+					
+					-- check
+					d(GetSkillAbilityId(skillType, skillIndex, abilityIndex))
+					d('.. texture = ' .. texture)
+					d('.. slotTexture = ' .. slotTexture)
 					
 						-- Save build item
 						skills[slotIndex - 2] = {slotName, slotTexture, abilityIndex, skillIndex, skillType, slotIndex}
