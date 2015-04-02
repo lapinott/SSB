@@ -9,6 +9,7 @@ SSB = {}
 SSB.Builds = {}
 SSB.Options = {}
 SSB.Bindings = {}
+SSB.Scrolllist = {}
 SSB.User = {}
 SSB.User.Builds = {}
 SSB.User.Options = {}
@@ -17,9 +18,10 @@ SSB.User.SavedBuildCount = 0
 
 -- Init main vars
 SSB.name = "SSB"
-SSB.niceName = " » "
+SSB.niceName = " |ccc2222» "
+SSB.niceName = " |ccc2222» "
 SSB.command = "/ssb"
-SSB.version = 1.6
+SSB.version = 1.62
 SSB.varVersion = 1
 SSB.maxKeybinds = 50
 SSB.barOne = "barOne"
@@ -30,18 +32,18 @@ SSB.skillThree = "skillThree"
 SSB.skillFour = "skillFour"
 SSB.skillFive = "skillFive"
 SSB.skillSix = "skillSix"
-SSB.currentActiveSkillBar = nil
-SSB.currentActiveSkillBarLocked = nil
-SSB.saveActionBarSwapPending = false
-SSB.saveActionBarSwapPendingBuildId = nil
-SSB.loadActionBarSwapPending = false
-SSB.loadActionBarSwapPendingBuildId = nil
+SSB.currentActiveBar = nil
+SSB.currentActiveBarLocked = nil
+SSB.saveSwapPending = false
+SSB.saveBuildName = nil
 SSB.saveBuildId = nil
+SSB.loadSwapPending = false
+SSB.loadBuildName = nil
 SSB.loadBuildId = nil
-SSB.silentLoad = false
+SSB.overWrite = false
 SSB.inCombat = false
+SSB.currentScroll = nil
 SSB.textNil = "nil"
-SSB.swapEventCount = 0
 
 -- Skill types
 SSB.skillTypes = {}
@@ -76,10 +78,12 @@ function SSB.Initialize(eventCode, addOnName)
 	setmetatable (SSB.Bindings, {__index = SSB.User.Bindings})
 	
 	-- Register keybinds
+	ZO_CreateStringId("SI_BINDING_NAME_SSB_SCROLL_UP", "Scroll loaded builds up")
+	ZO_CreateStringId("SI_BINDING_NAME_SSB_SCROLL_DOWN", "Scroll loaded builds down")
 	for i = 1, SSB.User.Options.availableKeyBinds, 1 do ZO_CreateStringId("SI_BINDING_NAME_SSB_LOAD_BUILD_" .. i, "Load build #" .. i) end
 	
 	-- Init some vars
-	SSB.currentActiveSkillBar, SSB.currentActiveSkillBarLocked = GetActiveWeaponPairInfo()
+	SSB.currentActiveBar, SSB.currentActiveBarLocked = GetActiveWeaponPairInfo()
 	
 	-- Attach Event listeners
 	EVENT_MANAGER:RegisterForEvent(SSB.name, EVENT_ACTIVE_WEAPON_PAIR_CHANGED, SSB.WeaponSwap);
@@ -95,19 +99,15 @@ function SSB.DoNothing() return nil end
 function SSB.WeaponSwap (event, activeWeaponPair, locked)
 
 	-- 1.6 hack -> 3 weapon swap events fired per weapon swap......
-	if activeWeaponPair == SSB.currentActiveSkillBar then return nil end
-	--SSB.swapEventCount = (SSB.swapEventCount + 1) % 3;
-	--if SSB.swapEventCount > 0 then return nil end
+	if activeWeaponPair == SSB.currentActiveBar then return nil end
 	
 	-- Save active skillbar
-	SSB.currentActiveSkillBar = activeWeaponPair;
-	SSB.currentActiveSkillBarLocked = locked;
+	SSB.currentActiveBar = activeWeaponPair;
+	SSB.currentActiveBarLocked = locked;
 	
 	-- Update pending
-	if SSB.saveActionBarSwapPending then SSB.SaveBuild (nil) end
-	if SSB.loadActionBarSwapPending then SSB.LoadBuild (SSB.loadActionBarSwapPendingBuildId) end
-	
-	--d(activeWeaponPair)
+	if SSB.saveSwapPending then SSB.SaveBuild (SSB.saveBuildName, 2) end
+	if SSB.loadSwapPending then SSB.LoadBuild (SSB.loadBuildId, 2, true) end
 	
 	return nil
 end
@@ -116,43 +116,48 @@ end
 function SSB.CombatState (event, inCombat) SSB.inCombat = inCombat end
 
 -- Save build
-function SSB.SaveBuild (buildName)
+function SSB.SaveBuild (buildName, iteration)
 
-	-- Check if build name already exists
-	local overWrite = false
-	local overWriteId = nil
-	for buildId, buildData in pairs(SSB.User.Builds) do
+	-- Init
+	if iteration == 1 then
+		SSB.saveSwapPending = false
+		SSB.saveBuildName = nil
+		SSB.saveBuildId = nil
+		SSB.overWrite = false
+		SSB.overWriteId = nil
+	end
 	
-		-- Check
-		if string.lower(buildData["friendlyName"]) == string.lower(buildName) then
-			
-			-- Save build ID to overwrite
-			overWrite = true
-			overWriteId = buildId;
+	-- Check if build name already exists
+	if (iteration == 1) then
+		for buildId, buildData in pairs(SSB.User.Builds) do
+		
+			-- Check
+			if string.lower(buildData["friendlyName"]) == string.lower(buildName) then
+				
+				-- Save build ID to overwrite
+				SSB.overWrite = true
+				SSB.overWriteId = buildId;
+			end
 		end
 	end
-
-	-- Build count id
-	if not SSB.saveActionBarSwapPending and not overWrite then SSB.User.SavedBuildCount = SSB.User.SavedBuildCount + 1 end
 	
 	-- Create build object - Regular
-	if not SSB.saveActionBarSwapPending and not overWrite then
+	if iteration == 1 and not SSB.overWrite then
+		SSB.saveBuildName = buildName
 		SSB.saveBuildId = "@" .. tostring(GetTimeStamp() * 1000 + GetGameTimeMilliseconds() % 1000);
+		SSB.User.SavedBuildCount = SSB.User.SavedBuildCount + 1
 		SSB.User.Builds[SSB.saveBuildId] = {}
 		SSB.User.Builds[SSB.saveBuildId]["friendlyId"] = SSB.User.SavedBuildCount;
-		SSB.User.Builds[SSB.saveBuildId]["friendlyName"] = buildName;
+		SSB.User.Builds[SSB.saveBuildId]["friendlyName"] = SSB.saveBuildName;
 	end
 	
 	-- Create build object - Overwrite
-	if not SSB.saveActionBarSwapPending and overWrite then
-		SSB.saveBuildId = overWriteId;
+	if iteration == 1 and SSB.overWrite then
+		SSB.saveBuildName = buildName
+		SSB.saveBuildId = SSB.overWriteId
 		SSB.User.Builds[SSB.saveBuildId][SSB.barOne] = {};
 		SSB.User.Builds[SSB.saveBuildId][SSB.barTwo] = {};
 	end
-	
-	-- Build id
-	if not SSB.saveActionBarSwapPending then SSB.saveActionBarSwapPendingBuildId = SSB.saveBuildId end
-	if SSB.saveActionBarSwapPending then SSB.saveBuildId = SSB.saveActionBarSwapPendingBuildId end
 	
 	-- Get current skills
 	local skills = {}
@@ -185,11 +190,6 @@ function SSB.SaveBuild (buildName)
 					-- Check
 					if (texture == slotTexture or texture == SSB.Textures[slotTexture] or name == slotName or name == SSB.Dictionnary[slotName]) and name ~= "" then
 					
-						-- check
-						d(GetSkillAbilityId(skillType, skillIndex, abilityIndex))
-						d('.. texture = ' .. texture)
-						d('.. slotTexture = ' .. slotTexture)
-					
 						-- Save build item
 						skills[slotIndex - 2] = {slotName, slotTexture, abilityIndex, skillIndex, skillType, slotIndex}
 						skillFound = true;
@@ -211,8 +211,8 @@ function SSB.SaveBuild (buildName)
 	
 	-- Bar index
 	local barIndex = nil
-	if SSB.currentActiveSkillBar == 1 then barIndex = SSB.barOne end
-	if SSB.currentActiveSkillBar == 2 then barIndex = SSB.barTwo end
+	if SSB.currentActiveBar == 1 then barIndex = SSB.barOne end
+	if SSB.currentActiveBar == 2 then barIndex = SSB.barTwo end
 	
 	-- Save current build
 	SSB.User.Builds[SSB.saveBuildId][barIndex] = {
@@ -225,24 +225,22 @@ function SSB.SaveBuild (buildName)
 	}
 	
 	-- Action bar swap pending
-	if GetUnitLevel("player") >= 15 then SSB.saveActionBarSwapPending = not SSB.saveActionBarSwapPending end
-	
-	-- Clean up
-	if not SSB.saveActionBarSwapPending then SSB.saveActionBarSwapPendingBuildId = nil end
-	if not SSB.saveActionBarSwapPending then SSB.saveBuildId = nil end
+	if GetUnitLevel("player") >= 15 and iteration == 1 then SSB.saveSwapPending = true
+	else SSB.saveSwapPending = false end
 	
 	-- Exit message
 	local savedOrOverwritten;
-	if overWrite then savedOrOverwritten = "overwritten";
+	if SSB.overWrite then savedOrOverwritten = "overwritten";
 	else savedOrOverwritten = "saved" end
-	if SSB.saveActionBarSwapPending then d(SSB.niceName .. "Build '" .. buildName .. "' for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " " .. savedOrOverwritten .. " with id #" .. tostring(SSB.User.SavedBuildCount) .. " ! Please swap your weapons.") end
-	if not SSB.saveActionBarSwapPending then d(SSB.niceName .. "Build '" .. buildName .. "' for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " " .. savedOrOverwritten .. " with id #" .. tostring(SSB.User.SavedBuildCount) .. " !") end
+	d(SSB.niceName .. "Build '" .. buildName .. "' " .. savedOrOverwritten .. " for action bar n°" .. tostring(SSB.currentActiveBar) .. " with id #" .. tostring(SSB.User.SavedBuildCount));
+	if SSB.saveSwapPending then d("|c22dd22Please swap your weapons.|r") end
+	if not SSB.saveSwapPending then d("|c22dd22All done.|r") end
 	
 	return nil
 end
 
 -- Load build
-function SSB.LoadBuild (buildNameOrId)
+function SSB.LoadBuild (buildNameOrId, iteration, silentLoad)
 
 	-- Return if player is in combat
 	if SSB.inCombat then
@@ -273,14 +271,10 @@ function SSB.LoadBuild (buildNameOrId)
 	-- Exit if build not found
 	if not buildExists then d(SSB.niceName .. "This build doesn't exist !") return false end
 	
-	-- Build id
-	if not SSB.loadActionBarSwapPending then SSB.loadActionBarSwapPendingBuildId = SSB.loadBuildId end
-	if SSB.loadActionBarSwapPending then SSB.loadBuildId = SSB.loadActionBarSwapPendingBuildId end
-	
 	-- Bar index
 	local barIndex = nil
-	if SSB.currentActiveSkillBar == 1 then barIndex = SSB.barOne end
-	if SSB.currentActiveSkillBar == 2 then barIndex = SSB.barTwo end
+	if SSB.currentActiveBar == 1 then barIndex = SSB.barOne end
+	if SSB.currentActiveBar == 2 then barIndex = SSB.barTwo end
 	
 	-- Bar data
 	local barData = buildToLoad[barIndex]
@@ -288,19 +282,58 @@ function SSB.LoadBuild (buildNameOrId)
 	-- Load skill for each slot
 	for skillKey, skill in pairs(barData) do SlotSkillAbilityInSlot(skill[5], skill[4], skill[3], skill[6]) end
 	
-	-- Action bar swap pending
-	if GetUnitLevel("player") >= 15 then SSB.loadActionBarSwapPending = not SSB.loadActionBarSwapPending end
+	-- Save/Notify scroll table
+	SSB.SaveScroll (buildToLoad["friendlyName"])
 	
-	-- Clean up
-	if not SSB.loadActionBarSwapPending then SSB.loadActionBarSwapPendingBuildId = nil end
-	if not SSB.loadActionBarSwapPending then SSB.loadBuildId = nil end
+	-- Action bar swap pending
+	if GetUnitLevel("player") >= 15 and iteration == 1 then SSB.loadSwapPending = true
+	else SSB.loadSwapPending = false end
 	
 	-- Exit message
-	if not SSB.silentLoad and SSB.loadActionBarSwapPending then d(SSB.niceName .. "Build id #" .. buildToLoad["friendlyId"] .. " [" .. buildToLoad["friendlyName"] .. "] loaded for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " ! Please swap your weapons.") end
-	if not SSB.silentLoad and not SSB.loadActionBarSwapPending then d(SSB.niceName .. "Build id #" .. buildToLoad["friendlyId"] .. " [" .. buildToLoad["friendlyName"] .. "] loaded for action bar n°" .. tostring(SSB.currentActiveSkillBar) .. " !") end
+	if not silentLoad then d(SSB.niceName .. "Build id #" .. buildToLoad["friendlyId"] .. " '" .. buildToLoad["friendlyName"] .. "' loaded for action bar n°" .. tostring(SSB.currentActiveBar) .. " !") end 
+	if not silentLoad and SSB.loadSwapPending then d("|c22dd22Please swap your weapons.|r") end
+	if not silentLoad and not SSB.loadSwapPending then d("|c22dd22All done.|r") end
 	
 	-- Notify
 	return nil
+end
+
+-- Save scroll
+function SSB.SaveScroll (buildName)
+
+	-- Check if build exists in scroll list
+	local found = false
+	for index, scrollName in ipairs(SSB.Scrolllist) do
+		if scrollName == buildName then
+			SSB.currentScroll = index
+			found = true
+		end
+	end
+	
+	-- Add new scroll build to scroll list
+	if not found then table.insert(SSB.Scrolllist, buildName) end
+	if not found then SSB.currentScroll = #SSB.Scrolllist end
+	
+end
+
+-- Scroll
+function SSB.Scroll (dir)
+
+	-- Return if no loaded builds available
+	if #SSB.Scrolllist == 0 then return end
+	
+	-- Get build index to load
+	local index;
+	if dir == 2 then 
+		if SSB.currentScroll == #SSB.Scrolllist then SSB.currentScroll = 1
+		else SSB.currentScroll = SSB.currentScroll + 1 end
+	elseif dir == 1 then
+		if SSB.currentScroll == 1 then SSB.currentScroll = #SSB.Scrolllist
+		else SSB.currentScroll = SSB.currentScroll - 1 end
+	end
+	
+	-- Load scrolled build
+	SSB.LoadBuild (SSB.Scrolllist[SSB.currentScroll], 1, true)
 end
 
 -- Show build
@@ -450,15 +483,13 @@ function SSB.LoadBuild_HK (bindId)
 	if SSB.Bindings[bindId] == nil then
 		
 		-- Notify
-		d(SSB.niceName .. "Binding #" .. tostring(bindId) .. " is not bind to any build !");
+		d(SSB.niceName .. "Binding #" .. tostring(bindId) .. " is not bound to any build !");
 		d(SSB.niceName .. "To bind this key use '/ssb bind " .. tostring(bindId) .. " [bindNameOrId]'");
 		return false
 	end
 	
 	-- Else load build
-	SSB.silentLoad = true
-	SSB.LoadBuild (SSB.Bindings[bindId])
-	SSB.silentLoad = true
+	SSB.LoadBuild (SSB.Bindings[bindId], 1, true)
 	
 	return nil
 end
@@ -582,12 +613,12 @@ function SSB.SlashCommands(text)
 			d(SSB.niceName .. "Please give a name to your build !")
 		elseif command[2] == tostring(tonumber(command[2])) then
 			d(SSB.niceName .. "Your build name can't be a number !")
-		else SSB.SaveBuild(command[2]) end
+		else SSB.SaveBuild(command[2], 1) end
 	end
 	if trigger == 'l' or trigger == 'load' then
 		if command[2] == nil then
 			d(SSB.niceName .. "Please specify the name or ID of the build you wish to load !");
-		else SSB.LoadBuild (command[2]) end
+		else SSB.LoadBuild (command[2], 1, false) end
 	end
 	if trigger == 'list' then SSB.ListBuilds () end
 	if trigger == 'show' then
