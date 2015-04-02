@@ -1,6 +1,13 @@
 <Bindings>
 	<Layer name="SI_KEYBINDINGS_CATEGORY_GENERAL">
 		<Category name="SSB Quickload">
+			<Action name="SSB_SCROLL_UP">
+				<Down>SSB.Scroll(1)</Down>
+			</Action>
+			<Action name="SSB_SCROLL_DOWN">
+				<Down>SSB.Scroll(2)</Down>
+			</Action>
+			
 			<Action name="SSB_LOAD_BUILD_1">
 				<Down>SSB.LoadBuild_HK("1")</Down>
 			</Action>
