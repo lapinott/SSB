@@ -78,8 +78,8 @@ function SSB.Initialize(eventCode, addOnName)
 	setmetatable (SSB.Bindings, {__index = SSB.User.Bindings})
 	
 	-- Register keybinds
-	ZO_CreateStringId("SI_BINDING_NAME_SSB_SCROLL_UP", "Scroll loaded builds up")
-	ZO_CreateStringId("SI_BINDING_NAME_SSB_SCROLL_DOWN", "Scroll loaded builds down")
+	ZO_CreateStringId("SI_BINDING_NAME_SSB_SCROLL_UP", "Scroll loaded builds forward")
+	ZO_CreateStringId("SI_BINDING_NAME_SSB_SCROLL_DOWN", "Scroll loaded builds backwards")
 	for i = 1, SSB.User.Options.availableKeyBinds, 1 do ZO_CreateStringId("SI_BINDING_NAME_SSB_LOAD_BUILD_" .. i, "Load build #" .. i) end
 	
 	-- Init some vars
@@ -324,10 +324,10 @@ function SSB.Scroll (dir)
 	
 	-- Get build index to load
 	local index;
-	if dir == 2 then 
+	if dir == 1 then
 		if SSB.currentScroll == #SSB.Scrolllist then SSB.currentScroll = 1
 		else SSB.currentScroll = SSB.currentScroll + 1 end
-	elseif dir == 1 then
+	elseif dir == 2 then
 		if SSB.currentScroll == 1 then SSB.currentScroll = #SSB.Scrolllist
 		else SSB.currentScroll = SSB.currentScroll - 1 end
 	end
