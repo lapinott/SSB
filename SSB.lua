@@ -46,15 +46,15 @@ SSB.currentScroll = nil
 SSB.textNil = "nil"
 
 -- Skill types
-SSB.skillTypes = {}
-table.insert(SSB.skillTypes, SKILL_TYPE_ARMOR);
-table.insert(SSB.skillTypes, SKILL_TYPE_AVA);
-table.insert(SSB.skillTypes, SKILL_TYPE_CLASS);
-table.insert(SSB.skillTypes, SKILL_TYPE_GUILD);
-table.insert(SSB.skillTypes, SKILL_TYPE_NONE);
-table.insert(SSB.skillTypes, SKILL_TYPE_RACIAL);
-table.insert(SSB.skillTypes, SKILL_TYPE_WEAPON);
-table.insert(SSB.skillTypes, SKILL_TYPE_WORLD);
+SSB.skillTrees = {}
+table.insert(SSB.skillTrees, SKILL_TYPE_ARMOR);
+table.insert(SSB.skillTrees, SKILL_TYPE_AVA);
+table.insert(SSB.skillTrees, SKILL_TYPE_CLASS);
+table.insert(SSB.skillTrees, SKILL_TYPE_GUILD);
+table.insert(SSB.skillTrees, SKILL_TYPE_NONE);
+table.insert(SSB.skillTrees, SKILL_TYPE_RACIAL);
+table.insert(SSB.skillTrees, SKILL_TYPE_WEAPON);
+table.insert(SSB.skillTrees, SKILL_TYPE_WORLD);
 
 -- User's
 SSB.User.Options.Verbous = true;
@@ -167,6 +167,11 @@ function SSB.SaveBuild (buildName, iteration)
 	
 	-- Slot indexes
 	for slotIndex = 3, 8, 1 do
+	
+		-- Find skill
+		local abilityId = GetSlotBoundId(slotIndex)
+		local v1, progressionIndex = GetAbilityProgressionXPInfoFromAbilityId(abilityId)
+		local tree, line, ability = GetSkillAbilityIndicesFromProgressionIndex(progressionIndex)
 		
 		-- Current slot index data
 		local slotName = GetSlotName(slotIndex);
@@ -175,25 +180,32 @@ function SSB.SaveBuild (buildName, iteration)
 		local slotBoundId = GetSlotBoundId(slotIndex);
 		skillFound = false;
 		
-		-- Ability type
-		for index, skillType in pairs(SSB.skillTypes) do
+		-- If skill not found do a recursive search
+		if tree == 0 then
 		
-			-- Skill index
-			for skillIndex = 1, GetNumSkillLines(index), 1 do
+			-- Ability type
+			for index, tree in pairs(SSB.skillTrees) do
 			
-				-- Ability index
-				for abilityIndex = 1, GetNumSkillAbilities(index, skillIndex), 1 do
+				-- Skill index
+				for line = 1, GetNumSkillLines(index), 1 do
 				
-					-- Save ability info
-					local name, texture, v3, v4, v5, v6, v7 = GetSkillAbilityInfo(skillType, skillIndex, abilityIndex);
+					-- Ability index
+					for ability = 1, GetNumSkillAbilities(index, line), 1 do
 					
-					-- Check
-					if (texture == slotTexture or texture == SSB.Textures[slotTexture] or name == slotName or name == SSB.Dictionnary[slotName]) and name ~= "" then
-					
-						-- Save build item
-						skills[slotIndex - 2] = {slotName, slotTexture, abilityIndex, skillIndex, skillType, slotIndex}
-						skillFound = true;
-						break;
+						-- Save ability info
+						local name, texture, v3, v4, v5, v6, v7 = GetSkillAbilityInfo(tree, line, ability);
+						
+						-- Check
+						if (texture == slotTexture or texture == SSB.Textures[slotTexture] or name == slotName or name == SSB.Dictionnary[slotName]) and name ~= "" then
+						
+							-- Save build item
+							skills[slotIndex - 2] = {slotName, slotTexture, ability, line, tree, slotIndex}
+							skillFound = true;
+							break;
+						end
+						
+						-- Speed up
+						if skillFound then break end
 					end
 					
 					-- Speed up
@@ -203,10 +215,9 @@ function SSB.SaveBuild (buildName, iteration)
 				-- Speed up
 				if skillFound then break end
 			end
-			
-			-- Speed up
-			if skillFound then break end
-		end
+		
+		-- Save build item
+		else skills[slotIndex - 2] = {slotName, slotTexture, ability, line, tree, slotIndex} end
 	end
 	
 	-- Bar index
